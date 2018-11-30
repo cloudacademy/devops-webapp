@@ -1,0 +1,38 @@
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'war'
+
+    group = 'org.cloudacademy.example.webapp'
+    version = '1.0'
+    status = 'integration'
+}
+
+// =======================================
+
+compileJava {
+    options.compilerArgs += '-proc:none'
+}
+
+// =======================================
+
+buildscript {
+  repositories {
+    jcenter()
+  }
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.10.0'
+    compile group: 'com.github.docker-java', name: 'docker-java', version: '3.0.14' 
+
+    providedCompile 'javax.servlet:javax.servlet-api:4.0.1' 
+    testCompile 'junit:junit:4.12'
+
+    runtime 'org.apache.logging.log4j:log4j-core:2.10.0'
+    runtime 'com.fasterxml.jackson.core:jackson-databind:2.9.3'
+    runtime 'com.github.docker-java:docker-java:3.0.14'
+}
