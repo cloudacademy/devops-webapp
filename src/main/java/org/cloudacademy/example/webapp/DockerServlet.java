@@ -25,6 +25,7 @@ import java.util.Iterator;
 @WebServlet(name = "DockerServlet", urlPatterns = { "/app", "/action1", "/action2", "/action3" }, loadOnStartup = 1)
 public class DockerServlet extends HttpServlet {
     final static String CONTAINER_NETWORK_NAME = System.getenv("CONTAINER_NETWORK");
+    final static String CONTAINER_SOCAT_ENABLED = System.getenv("CONTAINER_SOCAT_ENABLED");
 
     // final static Log logger = LogFactory.getLog(DockerServlet.class);
 
@@ -32,32 +33,46 @@ public class DockerServlet extends HttpServlet {
     // final static Logger logger = LogManager.getLogger("CONSOLE_JSON_APPENDER");
     // logger.debug("Debug message");
 
-    DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder().withDockerHost("tcp://socat:2375").build();
+    private static DockerClientConfig config = null;
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        // get the docker client
-        DockerClient client = DockerClientBuilder.getInstance(config).build();
-        // prepare command to retrieve the list of (running) containers
-        ListContainersCmd listContainersCmd = client.listContainersCmd().withStatusFilter("running");
-        // and set the generic filter regarding name
-        listContainersCmd.getFilters().put("name", Arrays.asList("webapp"));
-        // finally, run the command
-        List<Container> containerList = listContainersCmd.exec();
-
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String containerId = null;
         String containerIp = null;
+        
+        try {
+            if(config == null){
+                if ((CONTAINER_SOCAT_ENABLED != null) && (CONTAINER_SOCAT_ENABLED.equals("true"))){
+                    //using socat to connect to docker api server:
+                    //docker run --net network123 -e CONTAINER_NETWORK=network123 -e CONTAINER_SOCAT_ENABLED=true --name webapp --rm -p 8000:8080 cloudacademydevops/webapp:latest
+                    //needs to be used on macos as /run/docker.sock is not exposed
+                    config = DefaultDockerClientConfig.createDefaultConfigBuilder().withDockerHost("tcp://socat:2375").build();
+                }
+                else{
+                    //using unix socket /run/docker.sock:
+                    //docker run -v /run/docker.sock:/run/docker.sock --net network123 -e CONTAINER_NETWORK=network123 --name webapp --rm -p 8000:8080 cloudacademydevops/webapp:latest
+                    config = DefaultDockerClientConfig.createDefaultConfigBuilder().build();
+                }                      
+            }
 
-        try{
+            // get the docker client
+            DockerClient client = DockerClientBuilder.getInstance(config).build();
+            // prepare command to retrieve the list of (running) containers
+            ListContainersCmd listContainersCmd = client.listContainersCmd().withStatusFilter("running");
+            // and set the generic filter regarding name
+            listContainersCmd.getFilters().put("name", Arrays.asList("webapp"));
+            // finally, run the command
+            List<Container> containerList = listContainersCmd.exec();
+
             Iterator<Container> containerIterator = containerList.iterator();
             while (containerIterator.hasNext()) {
                 Container container = containerIterator.next();
     
                 containerId = container.getId().substring(0, 10);
-                containerIp = container.getNetworkSettings().getNetworks().get(CONTAINER_NETWORK_NAME).getIpAddress();    
+                containerIp = container.getNetworkSettings().getNetworks().get(CONTAINER_NETWORK_NAME).getIpAddress();
             }    
         }
         catch (Exception e){
+            logger.error("docker problem:" + e.getMessage());
             containerId = "unknown";
             containerIp = "unknown";
         }

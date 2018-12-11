@@ -1,0 +1,27 @@
+version: "2"
+services:
+  webapp:
+    container_name: webapp
+    image: cloudacademydevops/webapp:latest
+    networks:
+      - devnetwork
+    ports:
+      - "8000:8080"
+    environment:
+      - CONTAINER_NETWORK=docker_devnetwork
+      - CONTAINER_SOCAT_ENABLED=true
+    depends_on:
+      - socat
+  socat:
+    container_name: socat
+    image: alpine/socat:latest
+    networks:
+      - devnetwork
+    command: tcp-listen:2375,fork,reuseaddr unix-connect:/var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    expose:
+      - "2375"
+
+networks:
+  devnetwork:
