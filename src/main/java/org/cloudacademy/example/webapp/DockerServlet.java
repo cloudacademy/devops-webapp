@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.Iterator;
 
-@WebServlet(name = "DockerServlet", urlPatterns = { "/app", "/action1", "/action2", "/action3" }, loadOnStartup = 1)
+@WebServlet(name = "DockerServlet", urlPatterns = { "/home", "/action1", "/action2", "/action3" }, loadOnStartup = 1)
 public class DockerServlet extends HttpServlet {
     final static String CONTAINER_NETWORK_NAME = System.getenv("CONTAINER_NETWORK");
     final static String CONTAINER_SOCAT_ENABLED = System.getenv("CONTAINER_SOCAT_ENABLED");
@@ -82,7 +82,7 @@ public class DockerServlet extends HttpServlet {
 
         String path = request.getServletPath() != null ? request.getServletPath() : "";
         switch (path) {
-        case "/app":
+        case "/home":
             request.getRequestDispatcher("response.jsp").forward(request, response);
             break;
         case "/action1":
