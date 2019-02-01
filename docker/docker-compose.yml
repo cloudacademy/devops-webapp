@@ -1,4 +1,4 @@
-version: "2"
+version: "3.5"
 services:
   webapp:
     container_name: webapp
@@ -25,3 +25,4 @@ services:
 
 networks:
   devnetwork:
+    name: devnetwork
