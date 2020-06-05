@@ -18,9 +18,11 @@ import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.api.command.ListContainersCmd;
 import com.github.dockerjava.api.model.Container;
+
 import java.util.List;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Collections;
 
 @WebServlet(name = "DockerServlet", urlPatterns = { "/home", "/action1", "/action2", "/action3" }, loadOnStartup = 1)
 public class DockerServlet extends HttpServlet {
@@ -38,7 +40,7 @@ public class DockerServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String containerId = null;
         String containerIp = null;
-        
+
         try {
             if(config == null){
                 if ((CONTAINER_SOCAT_ENABLED != null) && (CONTAINER_SOCAT_ENABLED.equals("true"))){
@@ -51,13 +53,15 @@ public class DockerServlet extends HttpServlet {
                     //using unix socket /run/docker.sock:
                     //docker run -v /run/docker.sock:/run/docker.sock --net network123 -e CONTAINER_NETWORK=network123 --name webapp --rm -p 8000:8080 cloudacademydevops/webapp:latest
                     config = DefaultDockerClientConfig.createDefaultConfigBuilder().build();
-                }                      
+                }
             }
 
             // get the docker client
             DockerClient client = DockerClientBuilder.getInstance(config).build();
             // prepare command to retrieve the list of (running) containers
-            ListContainersCmd listContainersCmd = client.listContainersCmd().withStatusFilter("running");
+
+            ListContainersCmd listContainersCmd = client.listContainersCmd().withStatusFilter(Collections.singleton("running"));
+
             // and set the generic filter regarding name
             listContainersCmd.getFilters().put("name", Arrays.asList("webapp"));
             // finally, run the command
@@ -69,7 +73,7 @@ public class DockerServlet extends HttpServlet {
     
                 containerId = container.getId().substring(0, 10);
                 containerIp = container.getNetworkSettings().getNetworks().get(CONTAINER_NETWORK_NAME).getIpAddress();
-            }    
+            }
         }
         catch (Exception e){
             logger.error("docker problem:" + e.getMessage());
