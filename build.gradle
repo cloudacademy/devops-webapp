@@ -31,8 +31,8 @@ repositories {
 }
 
 dependencies {
-    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.10.0'
-    compile group: 'com.github.docker-java', name: 'docker-java', version: '3.2.1'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core'
+    compile group: 'com.github.docker-java', name: 'docker-java'
 
     providedCompile 'javax.servlet:javax.servlet-api:4.0.1' 
     testCompile 'junit:junit:4.12'
