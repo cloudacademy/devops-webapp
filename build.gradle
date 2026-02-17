@@ -22,13 +22,14 @@ compileJava {
 
 buildscript {
   repositories {
-    jcenter()
+    mavenCentral()
   }
 }
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
+
 
 dependencies {
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.10.0'
