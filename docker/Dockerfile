@@ -1,4 +1,4 @@
-FROM tomcat:9.0.35-jdk8-openjdk
+FROM tomcat:9.0.120-jdk21-corretto
 LABEL maintainer="jeremy.cook@cloudacademy.com"
 
 COPY splunkforwarder-7.2.1-be11b2c46e23-linux-2.6-amd64.deb /tmp

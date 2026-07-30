@@ -8,8 +8,8 @@ allprojects {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 // =======================================
@@ -21,27 +21,13 @@ compileJava {
 // =======================================
 
 buildscript {
-    repositories {
-        maven {
-            url "http://artifactory:8081/artifactory/jcenter"
-            credentials {
-                username = 'admin'
-                password = 'qwerty123'
-            }
-            allowInsecureProtocol = true
-        }
-    }
+  repositories {
+    mavenCentral()
+  }
 }
 
 repositories {
-    maven {
-        url "http://artifactory:8081/artifactory/jcenter"
-        credentials {
-            username = 'admin'
-            password = 'qwerty123'
-        }
-        allowInsecureProtocol = true
-    }
+    mavenCentral()
 }
 
 dependencies {
